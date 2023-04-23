@@ -6,7 +6,7 @@ data = points.data
 x = []
 y = []
 
-for i in range(0, len(data), 2):
+for i in range(0, len(data), 2 * 4):
     x.append(data[i])
     y.append(data[i + 1])
 
