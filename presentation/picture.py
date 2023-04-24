@@ -4,7 +4,7 @@ from manim_slides import Slide
 import sys
 sys.path.append("../code")
 
-from .. import fourier
+import fourier
 
 class Picture(Slide):
     def construct(self):
