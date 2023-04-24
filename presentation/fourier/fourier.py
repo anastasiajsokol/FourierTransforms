@@ -38,28 +38,27 @@ class Fourier:
         scale = self.scale
 
         center = (self.origin[0], self.origin[1])
+        time = self.time
 
-        def horizontal(n: int, direction: int, time: float) -> Tuple[float, float]:
+        def horizontal(n: int, direction: int) -> Tuple[float, float]:
             radius, alpha = self.x_coefs[n]
             x = center[0] + radius / 2 * cos(n * scale * time + alpha)
             y = center[1] + direction * radius / 2 * sin(n * scale * time + alpha)
-            yield ((x, y, radius), (*center, x, y))
             center = (x, y)
+            return ((x, y, radius), (*center, x, y))
         
-        def vertical(n: int, direction: int, time: float):
+        def vertical(n: int, direction: int):
             radius, alpha = self.y_coefs[n]
             x = center[0] + direction * radius / 2 * sin(n * scale * time + alpha)
             y = center[1] + radius / 2 * cos(n * scale * time + alpha)
-            yield ((x, y, radius), (*center, x, y))
             center = (x, y)
+            return ((x, y, radius), (*center, x, y))
 
-        time = self.time
-        
         for i in range(1, self.number_of_coefficents):
-            yield from horizontal(i, 1, time)
-            yield from vertical(i, -1, time)
-            yield from horizontal(i, -1, time)
-            yield from vertical(i, 1, time)
+            yield horizontal(i, 1)
+            yield vertical(i, -1)
+            yield horizontal(i, -1)
+            yield vertical(i, 1)
         
         return center
     
