@@ -75,9 +75,9 @@ def _main():
     import pygame
     import sys
     
-    import example.hack as hack
-
-    fourier = Fourier(50, hack.x, hack.y, 0.5)
+    import example.point_arrays as point_arrays
+    
+    fourier = Fourier(50, point_arrays.x, point_arrays.y, 0.5)
     old_point = None
 
     w, h = 800, 480
