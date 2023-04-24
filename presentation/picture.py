@@ -8,6 +8,7 @@ import fourier
 
 class Picture(Slide):
     def construct(self):
+        # use a value tracker!!!
         def line(sx, sy, ex, ey):
             self.add(Line([sx, sy, 0], [ex, ey, 0], color="RED"))
         
