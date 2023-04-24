@@ -34,40 +34,45 @@ class Fourier:
         self.scale = scale
         self._generate_coefficents(number_of_coefficents, x_data, y_data)
     
-    def draw(self, circle: Callable, line: Callable) -> List[Tuple[float, float]]:
+    def __iter__(self):
         scale = self.scale
 
-        def horizontal(n: int, direction: int, center: Tuple[float, float], time: float) -> Tuple[float, float]:
+        center = (self.origin[0], self.origin[1])
+
+        def horizontal(n: int, direction: int, time: float) -> Tuple[float, float]:
             radius, alpha = self.x_coefs[n]
             x = center[0] + radius / 2 * cos(n * scale * time + alpha)
             y = center[1] + direction * radius / 2 * sin(n * scale * time + alpha)
-            
-            circle(x, y, radius)
-            line(center[0], center[1], x, y)
-
-            return (x, y)
+            yield ((x, y, radius), (*center, x, y))
+            center = (x, y)
         
-        def vertical(n: int, direction: int, center: Tuple[float, float], time: float):
+        def vertical(n: int, direction: int, time: float):
             radius, alpha = self.y_coefs[n]
             x = center[0] + direction * radius / 2 * sin(n * scale * time + alpha)
             y = center[1] + radius / 2 * cos(n * scale * time + alpha)
-
-            circle(x, y, radius)
-            line(center[0], center[1], x, y)
-
-            return (x, y)
+            yield ((x, y, radius), (*center, x, y))
+            center = (x, y)
 
         time = self.time
-
-        center = (self.origin[0], self.origin[1])
+        
         for i in range(1, self.number_of_coefficents):
-            center = horizontal(i, 1, center, time)
-            center = vertical(i, -1, center, time)
-            center = horizontal(i, -1, center, time)
-            center = vertical(i, 1, center, time)
+            yield from horizontal(i, 1, time)
+            yield from vertical(i, -1, time)
+            yield from horizontal(i, -1, time)
+            yield from vertical(i, 1, time)
         
         return center
     
+    def draw(self, circle: Callable, line: Callable) -> Tuple[float, float]:
+        points = iter(self)
+        try:
+            while True:
+                    c, l = next(points)
+                    circle(*c)
+                    line(*l)
+        except StopIteration as end:
+            return end.value
+
     def step(self, dt: float):
         self.time += dt
 
