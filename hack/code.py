@@ -1,104 +1,118 @@
-from math import sqrt, asinh, atan, atan2, cos, sin, pi
+from math import sqrt, atan2, cos, sin, pi
+from typing import Tuple, List, Callable
 import numpy as np
-import pygame
-from pygame.locals import *
-import sys
-import random
 
-import hack
+class Fourier:
+    __slots__ = ["number_of_coefficents", "origin", "time", "x_coefs", "y_coefs", "scale"]
 
-x_data = hack.x
-y_data = hack.y
+    def _generate_coefficents(self, number_of_coefficents: int, x_data: list, y_data: list) -> Tuple[List[float], List[float]]:
+        assert(len(x_data) == len(y_data))
 
-J = len(x_data)
-
-N = 5
-T = 1
-F = 0.1
-
-dt = 0.05
-
-x_coefs = [[] for _ in range(N)]
-y_coefs = [[] for _ in range(N)]
-
-for n in range(N):
-    Sum_xcos, Sum_xsin, Sum_ycos, Sum_ysin = 0, 0, 0, 0
-
-    for j in range(J):
-        Sum_xcos += 2 / J * x_data[j] * cos(n * 2 * pi * j / J)
-        Sum_xsin += 2 / J * x_data[j] * sin(n * 2 * pi * j / J)
-        Sum_ycos += 2 / J * y_data[j] * cos(n * 2 * pi * j / J)
-        Sum_ysin += 2 / J * y_data[j] * sin(n * 2 * pi * j / J)
-
-    x_coefs[n] = [Sum_xcos, Sum_xsin]  
-    y_coefs[n] = [Sum_ycos, Sum_ysin]
-
-print(y_coefs)
-
-old_point = None
-
-w, h = 800, 480
-
-screen = pygame.display.set_mode((w,h))
-trace = pygame.Surface((w,h))
-screen.fill((100, 30, 170))
-pygame.display.update()
-clock = pygame.time.Clock()
-
-def draw_hor(n, d, P, t): #(harmonic, direction, center, time)
-    R = sqrt(x_coefs[n][0]**2 + x_coefs[n][1]**2)
-    alpha = atan(x_coefs[n][1] / x_coefs[n][0])
-    pygame.draw.circle(screen, (100,40,70), P, R / 2, width = 2)
-    pygame.draw.line(screen, (200,20,35), P, [P[0] + R / 2 * cos(n * F * t + alpha), P[1] + d * R / 2 * sin(n * F * t + alpha)], width = 3)
-    return [P[0] + R / 2 * cos(n * F * t + alpha), P[1] + d * R / 2 * sin(n * F * t + alpha)]
-
-
-def draw_ver(n, d, P, t):
-    R = sqrt(y_coefs[n][0]**2 + y_coefs[n][1]**2)
-    alpha = atan(y_coefs[n][1] / y_coefs[n][0]) 
-    pygame.draw.circle(screen, (100,40,70), P, R / 2, width = 2)
-    pygame.draw.line(screen, (200,20,35), P, [P[0] + d * R / 2 * sin(n * F * t + alpha), P[1] + R / 2 * cos(n * F * t + alpha)], width = 3)
-    return [P[0] + d * R / 2 * sin(n * F * t + alpha), P[1] + R / 2 * cos(n * F * t + alpha)]
-
-
-def Trace(A, B, Color):
-    pygame.draw.line(trace, Color, A, B, width = 4)
-    return
-
-
-for j in range(J - 1):
-    Trace((w/2 + x_data[j], h/2 + y_data[j]), (w/2 + x_data[j + 1], h/2 + y_data[j + 1]), (10, 200, 50))
-
-"""for j in range(J - 1):
-    Trace((j * w / J, h/2 + x_data[j]), ((j+1) * w / J, h/2 + x_data[j + 1]), (10, 200, 50))
-"""
-
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-    
-    screen.fill((100, 30, 170))
-    screen.blit(trace, (0, 0))
-
-    Center = [w / 2, h / 2]
-    
-    for i in range(1, N):
-        Center = draw_hor(i, 1, Center, T)
-        Center = draw_ver(i, -1, Center, T)
-        Center = draw_hor(i, -1, Center, T)
-        Center = draw_ver(i, 1, Center, T)
-
-
+        J = len(x_data)
         
+        x_coefs = np.zeros(number_of_coefficents, dtype=(float, 2))
+        y_coefs = np.zeros(number_of_coefficents, dtype=(float, 2))
 
-    if old_point:
-        Trace(old_point, Center, (40, 0, 200))
+        for n in range(number_of_coefficents):
+            sum_cos_x = sum((2 / J * x_data[j] * cos(n * 2 * pi * j / J) for j in range(J)))
+            sum_cos_y = sum((2 / J * y_data[j] * cos(n * 2 * pi * j / J) for j in range(J)))
+            sum_sin_x = sum((2 / J * x_data[j] * sin(n * 2 * pi * j / J) for j in range(J)))
+            sum_sin_y = sum((2 / J * y_data[j] * sin(n * 2 * pi * j / J) for j in range(J)))
 
+            x_coefs[n] = (sqrt(sum_cos_x ** 2 + sum_sin_x ** 2), atan2(sum_sin_x, sum_cos_x)) # cosx, sinx, radius, alpha
+            y_coefs[n] = (sqrt(sum_cos_y ** 2 + sum_sin_y ** 2), atan2(sum_sin_y, sum_cos_y)) # cosy, siny, radius, alpha
 
+            if n == 0:
+                self.origin = (sum_cos_x, sum_cos_y)
 
-    old_point = Center
+        self.x_coefs = x_coefs
+        self.y_coefs = y_coefs
 
-    T += dt
-    clock.tick(100)
+    def __init__(self, number_of_coefficents: int, x_data: list, y_data: list, scale: float = 1):
+        self.number_of_coefficents = number_of_coefficents
+        self.time = 1
+        self.scale = scale
+        self._generate_coefficents(number_of_coefficents, x_data, y_data)
+    
+    def draw(self, circle: Callable, line: Callable) -> List[Tuple[float, float]]:
+        scale = self.scale
+
+        def horizontal(n: int, direction: int, center: Tuple[float, float], time: float) -> Tuple[float, float]:
+            radius, alpha = self.x_coefs[n]
+            x = center[0] + radius / 2 * cos(n * scale * time + alpha)
+            y = center[1] + direction * radius / 2 * sin(n * scale * time + alpha)
+            
+            circle(x, y, radius)
+            line(center[0], center[1], x, y)
+
+            return (x, y)
+        
+        def vertical(n: int, direction: int, center: Tuple[float, float], time: float):
+            radius, alpha = self.y_coefs[n]
+            x = center[0] + direction * radius / 2 * sin(n * scale * time + alpha)
+            y = center[1] + radius / 2 * cos(n * scale * time + alpha)
+
+            circle(x, y, radius)
+            line(center[0], center[1], x, y)
+
+            return (x, y)
+
+        time = self.time
+
+        center = (self.origin[0], self.origin[1])
+        for i in range(1, self.number_of_coefficents):
+            center = horizontal(i, 1, center, time)
+            center = vertical(i, -1, center, time)
+            center = horizontal(i, -1, center, time)
+            center = vertical(i, 1, center, time)
+        
+        return center
+    
+    def step(self, dt: float):
+        self.time += dt
+
+def _main():
+    import pygame
+    import sys
+    
+    import hack
+
+    fourier = Fourier(50, hack.x, hack.y, 0.5)
+    old_point = None
+
+    w, h = 800, 480
+    hw, hh = w / 2, h / 2
+
+    screen = pygame.display.set_mode((w,h))
+    trace = pygame.Surface((w,h))
+    screen.fill((100, 30, 170))
     pygame.display.update()
+    clock = pygame.time.Clock()
+
+    def circle(x: float, y: float, radius: float, color: Tuple[int, int, int] = (100, 40, 70), surface: pygame.Surface = screen):
+        pygame.draw.circle(surface, color, (hw + x, hh + y), radius, width = 2)
+
+    def line(start_x: float, start_y: float, end_x: float, end_y: float, color: Tuple[int, int, int] = (200, 20, 35), surface: pygame.Surface = screen):
+        pygame.draw.line(surface, color, (hw + start_x, hh + start_y), (hw + end_x, hh + end_y), width = 3)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+        
+        screen.fill((100, 30, 170))
+        screen.blit(trace, (0, 0))
+        
+        center = fourier.draw(circle, line)
+
+        if old_point:
+            line(old_point[0], old_point[1], center[0], center[1], color = (40, 0, 200), surface = trace)
+        old_point = center
+        
+        fourier.step(0.02)
+
+        clock.tick(100)
+        pygame.display.update()
+
+if __name__ == "__main__":
+    _main()
