@@ -75,7 +75,7 @@ def _main():
     import pygame
     import sys
     
-    import hack
+    import example.hack as hack
 
     fourier = Fourier(50, hack.x, hack.y, 0.5)
     old_point = None

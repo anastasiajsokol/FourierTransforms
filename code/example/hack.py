@@ -1,4 +1,4 @@
-import points
+from . import points
 import numpy
 
 data = points.data
