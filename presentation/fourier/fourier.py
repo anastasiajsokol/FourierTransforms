@@ -41,18 +41,22 @@ class Fourier:
         time = self.time
 
         def horizontal(n: int, direction: int) -> Tuple[float, float]:
+            nonlocal center, scale
             radius, alpha = self.x_coefs[n]
             x = center[0] + radius / 2 * cos(n * scale * time + alpha)
             y = center[1] + direction * radius / 2 * sin(n * scale * time + alpha)
+            positions = ((x, y, radius), (*center, x, y))
             center = (x, y)
-            return ((x, y, radius), (*center, x, y))
+            return positions
         
         def vertical(n: int, direction: int):
+            nonlocal center, scale
             radius, alpha = self.y_coefs[n]
             x = center[0] + direction * radius / 2 * sin(n * scale * time + alpha)
             y = center[1] + radius / 2 * cos(n * scale * time + alpha)
+            positions = ((x, y, radius), (*center, x, y))
             center = (x, y)
-            return ((x, y, radius), (*center, x, y))
+            return positions
 
         for i in range(1, self.number_of_coefficents):
             yield horizontal(i, 1)
