@@ -85,7 +85,7 @@ def _main():
     
     import example.point_arrays as point_arrays
     
-    fourier = Fourier(50, point_arrays.x, point_arrays.y, 0.5)
+    fourier = Fourier(200, point_arrays.x, point_arrays.y, 0.5)
     old_point = None
 
     w, h = 800, 480
