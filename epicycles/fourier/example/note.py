@@ -644,3 +644,21 @@ data = [23.695899993143392,87.89626411208738,
 24.6664306640625,88.6216064453125,
 23.856716224830596,88.03605166366324,
 ]
+
+import numpy
+
+x = []
+y = []
+
+for i in range(0, len(data), 2):
+    x.append(data[i])
+    y.append(data[i + 1])
+
+x = numpy.array(x)
+y = numpy.array(y)
+
+x *= 3
+y *= 3
+
+x -= 150
+y -= 150

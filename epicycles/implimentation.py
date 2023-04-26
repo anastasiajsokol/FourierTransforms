@@ -1,7 +1,7 @@
 from manim import *
-from manim_presentation import Slide
+from manim_slides import Slide
 
-class Code(Slide):
+class Implimentation(Slide):
   def construct(self):
     coefs = Code(code="""def _generate_coefficents(self, number_of_coefficents: int, x_data: list, y_data: list) -> Tuple[List[float], List[float]]:
         assert(len(x_data) == len(y_data))
@@ -54,11 +54,14 @@ class Code(Slide):
         
         return center""", language="python")
     
+    coefs.scale(0.5)
+    iter.scale(0.5)
+
     self.add(coefs)
-
-    self.pause()
-
-    self.remove(coefs)
-    self.add(iter)
+    self.wait()
     
-    self.pause()
+    self.next_slide()
+    
+    self.play(Transform(coefs, iter))
+
+    self.next_slide()

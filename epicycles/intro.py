@@ -1,10 +1,10 @@
 from manim import *
-from manim_presentation import Slide
+from manim_slides import Slide
 
 class Intro(Slide):
   def construct(self):
     title = Tex("Fourier Epicycles")
-    subtitle = Tex("Drawing pictures with rotating circles")
+    subtitle = Tex("Drawing pictures with rotations")
 
     title.scale(2)
     subtitle.scale(0.8)
@@ -14,4 +14,4 @@ class Intro(Slide):
     self.play(Write(title))
     self.play(Write(subtitle))
 
-    self.pause()
+    self.next_slide()

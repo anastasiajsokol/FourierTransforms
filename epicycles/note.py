@@ -4,7 +4,7 @@ import numpy as np
 
 from fourier.fourier import Fourier
 
-import fourier.example.point_arrays as points_arrays
+import fourier.example.note as points_arrays
 
 class Picture(Slide):
     def construct(self):
