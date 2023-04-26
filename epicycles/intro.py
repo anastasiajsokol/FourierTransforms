@@ -1,5 +1,5 @@
 from manim import *
-from manim_slides import Slide
+from manim_presentation import Slide
 
 class Intro(Slide):
   def construct(self):
@@ -14,4 +14,4 @@ class Intro(Slide):
     self.play(Write(title))
     self.play(Write(subtitle))
 
-    self.next_slide()
+    self.pause()

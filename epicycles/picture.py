@@ -1,5 +1,5 @@
 from manim import *
-from manim_slides import Slide
+from manim_presentation import Slide
 import numpy as np
 
 from fourier.fourier import Fourier
@@ -61,4 +61,4 @@ class Picture(Slide):
         
         self.wait(20)
         
-        self.next_slide()
+        self.pause()

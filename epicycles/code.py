@@ -1,5 +1,5 @@
 from manim import *
-from manim_slides import Slide
+from manim_presentation import Slide
 
 class Code(Slide):
   def construct(self):
@@ -56,9 +56,9 @@ class Code(Slide):
     
     self.add(coefs)
 
-    self.next_slide()
+    self.pause()
 
     self.remove(coefs)
     self.add(iter)
     
-    self.next_slide()
+    self.pause()
