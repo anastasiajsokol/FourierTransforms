@@ -27,10 +27,10 @@ class Fourier:
 
         self.x_coefs = x_coefs
         self.y_coefs = y_coefs
-
-    def __init__(self, number_of_coefficents: int, x_data: list, y_data: list, scale: float = 1):
+    
+    def __init__(self, number_of_coefficents: int, x_data: list, y_data: list, scale: float = 1, start: float = 1):
         self.number_of_coefficents = number_of_coefficents
-        self.time = 1
+        self.time = self.start
         self.scale = scale
         self._generate_coefficents(number_of_coefficents, x_data, y_data)
     
