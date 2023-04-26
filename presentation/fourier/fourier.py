@@ -2,6 +2,8 @@ from math import sqrt, atan2, cos, sin, pi
 from typing import Tuple, List, Callable
 import numpy as np
 
+tau = 2 * pi
+
 class Fourier:
     __slots__ = ["number_of_coefficents", "origin", "time", "x_coefs", "y_coefs", "scale"]
 
@@ -14,23 +16,23 @@ class Fourier:
         y_coefs = np.zeros(number_of_coefficents, dtype=(float, 2))
 
         for n in range(number_of_coefficents):
-            sum_cos_x = sum((2 / J * x_data[j] * cos(n * 2 * pi * j / J) for j in range(J)))
-            sum_cos_y = sum((2 / J * y_data[j] * cos(n * 2 * pi * j / J) for j in range(J)))
-            sum_sin_x = sum((2 / J * x_data[j] * sin(n * 2 * pi * j / J) for j in range(J)))
-            sum_sin_y = sum((2 / J * y_data[j] * sin(n * 2 * pi * j / J) for j in range(J)))
+            sum_cos_x = sum((2 / J * x_data[j] * cos(n * tau * j / J) for j in range(J)))
+            sum_cos_y = sum((2 / J * y_data[j] * cos(n * tau * j / J) for j in range(J)))
+            sum_sin_x = sum((2 / J * x_data[j] * sin(n * tau * j / J) for j in range(J)))
+            sum_sin_y = sum((2 / J * y_data[j] * sin(n * tau * j / J) for j in range(J)))
 
-            x_coefs[n] = (sqrt(sum_cos_x ** 2 + sum_sin_x ** 2), atan2(sum_sin_x, sum_cos_x)) # cosx, sinx, radius, alpha
-            y_coefs[n] = (sqrt(sum_cos_y ** 2 + sum_sin_y ** 2), atan2(sum_sin_y, sum_cos_y)) # cosy, siny, radius, alpha
+            x_coefs[n] = (sqrt(sum_cos_x ** 2 + sum_sin_x ** 2), atan2(sum_sin_x, sum_cos_x)) # radius, alpha
+            y_coefs[n] = (sqrt(sum_cos_y ** 2 + sum_sin_y ** 2), atan2(sum_sin_y, sum_cos_y)) # radius, alpha
 
             if n == 0:
                 self.origin = (sum_cos_x, sum_cos_y)
 
         self.x_coefs = x_coefs
         self.y_coefs = y_coefs
-
-    def __init__(self, number_of_coefficents: int, x_data: list, y_data: list, scale: float = 1):
+    
+    def __init__(self, number_of_coefficents: int, x_data: list, y_data: list, scale: float = 1, start: float = 1):
         self.number_of_coefficents = number_of_coefficents
-        self.time = 1
+        self.time = self.start
         self.scale = scale
         self._generate_coefficents(number_of_coefficents, x_data, y_data)
     

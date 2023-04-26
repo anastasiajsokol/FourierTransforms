@@ -3,8 +3,8 @@ from manim_slides import Slide
 
 class Intro(Slide):
   def construct(self):
-    title = Tex("Fourier Transforms")
-    subtitle = Tex("And drawing pictures with rotating circles")
+    title = Tex("Fourier Epicycles")
+    subtitle = Tex("Drawing pictures with rotating circles")
 
     title.scale(2)
     subtitle.scale(0.8)
